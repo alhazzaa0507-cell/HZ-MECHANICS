@@ -162,8 +162,10 @@ h1{font-family:var(--disp);font-size:clamp(28px,3.6vw,44px);line-height:1.1;font
 .kpi.outs .dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
 .kpi.photo .bar4{position:absolute;left:0;right:0;bottom:0;height:4px;background:var(--accent)}
 
+.kpi.revs .rvnote{display:block;margin-top:2px;font-weight:600;font-size:11px;color:#ff6b5a}
 /* tabs */
-nav.tabs{display:flex;align-items:center;gap:8px;padding-block:26px 0;flex-wrap:wrap}
+nav.tabs{display:flex;align-items:center;gap:8px;margin-top:22px;padding:8px 12px 12px;background:var(--plate);border:1px solid var(--line);border-radius:16px;flex-wrap:wrap}
+.tabs-lbl{flex:0 0 100%;display:flex;align-items:center;gap:7px;height:24px;padding:0 4px;color:var(--accent-ink);font:700 13px var(--disp);white-space:nowrap}
 .tab{height:48px;padding:0 20px;border-radius:12px;border:1px solid #3d444d;background:linear-gradient(180deg,#2b3037,#22262c);color:var(--ink);font:700 16px var(--disp);display:inline-flex;align-items:center;gap:10px;box-shadow:0 2px 0 #14161a,inset 0 1px 0 rgba(255,255,255,.06);transition:background .15s,border-color .15s,transform .1s}
 .tab:hover{background:linear-gradient(180deg,#343a42,#2a2f36);border-color:#5a626d}
 .tab:active{transform:translateY(1px);box-shadow:0 1px 0 #14161a}
@@ -422,7 +424,8 @@ footer.foot{padding-block:0 28px;display:flex;justify-content:space-between;gap:
   .kpis{grid-template-columns:repeat(2,minmax(0,1fr))}
   .kpis .kpi.photo{grid-column:span 2}
   .tcards{grid-template-columns:repeat(3,minmax(0,1fr))}
-  nav.tabs{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;padding-block:18px 0}
+  nav.tabs{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:6px;margin-top:16px;padding:8px}
+  .tabs-lbl{grid-column:1/-1;height:26px;border:0;margin:0;padding:0 4px;font-size:13px}
   .tab{justify-content:center;height:38px;padding:0 4px;font-size:13px;border-radius:10px;gap:0;white-space:nowrap}
   .tab .num{display:none}
   nav.tabs button.tab:nth-of-type(1){grid-column:span 4}
@@ -724,6 +727,7 @@ body.ro #app input[readonly]{cursor:default}
 
   <div id="exportTitle"><i></i><h2 id="exportTitleText"></h2></div>
   <nav class="tabs" role="tablist" aria-label="أقسام الحاسبة">
+    <span class="tabs-lbl" aria-hidden="true"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>اختر القسم</span>
     <button class="tab" role="tab" id="tab-entry" data-tab="entry" aria-selected="true"><span class="num">01</span>لوحة الإدخال</button>
     <button class="tab" role="tab" id="tab-month" data-tab="month" aria-selected="false"><span class="num">02</span>سجل الشهر</button>
     <button class="tab" role="tab" id="tab-techs" data-tab="techs" aria-selected="false"><span class="num">03</span>الفنيين والعمولات</button>
@@ -1400,7 +1404,7 @@ function renderKpis(C){
      return '<div class="kpi outs"><div class="lbl">المصروفات والعمل الإضافي</div><div class="val"><b>'+fmt2(t)+'</b><span>ر.س</span></div>'+
      '<div class="obar" aria-hidden="true">'+(t?'<i class="e" style="width:'+pe+'%"></i><i class="o" style="width:'+(100-pe)+'%"></i>':'')+'</div>'+
      '<div class="rows"><div><span class="dot e"></span>المصروفات<b>'+fmt2(e)+'</b></div><div><span class="dot o"></span>العمل الإضافي<b>'+fmt2(o)+'</b></div></div></div>';})()+
-   '<div class="kpi outs revs"><div class="lbl">الواردات <span style="font-weight:600;font-size:11px;color:#ff6b5a">(للاطلاع، غير محسوبة في الصافي)</span></div><div class="val"><b>'+fmt2(C.revTotal)+'</b><span>ر.س</span></div>'+
+   '<div class="kpi outs revs"><div class="lbl">الواردات<span class="rvnote">(للاطلاع، غير محسوبة في الصافي)</span></div><div class="val"><b>'+fmt2(C.revTotal)+'</b><span>ر.س</span></div>'+
      '<div class="rows"><div><span class="dot ri"></span>مخلفات حديد<b>'+fmt2(C.revBy.iron||0)+'</b></div><div><span class="dot ro"></span>مخلفات زيت<b>'+fmt2(C.revBy.oil||0)+'</b></div><div><span class="dot rx"></span>أخرى<b>'+fmt2(C.revBy.other||0)+'</b></div></div></div>'+
    (function(){var ks=Object.keys(C.abBy).sort(function(a,b){return C.abBy[b]-C.abBy[a];}),cnt=ks.length;
      return '<div class="kpi outs abs"><div class="lbl">الغياب</div>'+
