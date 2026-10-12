@@ -1,0 +1,39 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    function userDoc() { return /databases/$(database)/documents/users/$(request.auth.uid); }
+    function hasRole() { return signedIn() && exists(userDoc()); }
+    function isAdmin() { return hasRole() && get(userDoc()).data.role == 'admin'; }
+    function setupPath() { return /databases/$(database)/documents/meta/setup; }
+
+    // يبيّن فقط هل تم إنشاء حساب المدير الأول
+    match /meta/setup {
+      allow get: if true;
+      allow create: if signedIn() && !exists(setupPath())
+        && getAfter(userDoc()).data.role == 'admin';
+      allow update, delete: if false;
+    }
+
+    match /users/{uid} {
+      allow get: if signedIn() && (request.auth.uid == uid || isAdmin());
+      allow list: if isAdmin();
+      // أول مدير فقط (مرة وحدة) أو مدير يضيف مستخدمين
+      allow create: if isAdmin()
+        || (signedIn() && request.auth.uid == uid
+            && !exists(setupPath()) && existsAfter(setupPath())
+            && request.resource.data.role == 'admin');
+      allow update, delete: if isAdmin();
+    }
+
+    // بيانات الورشة: القراءة لأي مستخدم مسجّل، التعديل للمدير فقط
+    match /config/{doc} {
+      allow read: if hasRole();
+      allow write: if isAdmin();
+    }
+    match /months/{doc} {
+      allow read: if hasRole();
+      allow write: if isAdmin();
+    }
+  }
+}
