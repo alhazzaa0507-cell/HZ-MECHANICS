@@ -320,6 +320,8 @@ table.heat{border-collapse:separate;border-spacing:0;width:100%;font-size:12px;t
 .spark i{flex:1 1 0;background:#6b737d;border-radius:2px;min-height:2px}
 .spark i.z{background:#2a2e34}.spark i.mx{background:var(--accent)}
 .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:5px 8px;font-size:11px;color:#8a929c}
+.facts .avgf{grid-column:1/-1;display:flex;align-items:center;justify-content:space-between;padding-top:6px;border-top:1px dashed var(--line2);color:var(--muted)}
+.facts .avgf b{color:var(--accent-ink);font-size:13px}
 .facts b{font-family:var(--mono);color:var(--ink);font-weight:500}
 .rate{display:flex;align-items:center;justify-content:space-between;padding-top:8px;border-top:1px dashed var(--line2)}
 .stepper{display:flex;align-items:center;gap:6px}
@@ -438,6 +440,11 @@ footer.foot{padding-block:0 28px;display:flex;justify-content:space-between;gap:
   nav.tabs .rule{display:none}
   .brand img{height:52px}.brand .sep{height:44px}
   .vsep{display:none}
+}
+@media (max-width:760px){
+  #app{zoom:.85}
+  .kpi.combo .toprow{flex-wrap:wrap;gap:2px 8px}
+  .kpi.combo .who.ell{white-space:normal;overflow:visible;text-overflow:clip;font-size:18px;line-height:1.25}
 }
 @media (max-width:340px){.tab{font-size:11.5px;padding:0 2px}}
 @media (max-width:480px){
@@ -797,7 +804,6 @@ body.ro #app input[readonly]{cursor:default}
       <div class="panel" id="tablePanel">
         <button type="button" class="panel-h foldbtn" id="foldHead" aria-expanded="true" aria-controls="table">
           <h2>سجل الشهر حسب الفني</h2>
-          <span class="hint">تقدر تعدّل المبالغ مباشرة. كلما زاد لون الخلية زاد الدخل</span>
           <span class="foldtag"><span id="foldTxt">إخفاء</span><svg class="chev" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 9l6 6 6-6"/></svg></span>
         </button>
         <div class="scroll-x" id="table"></div>
@@ -1567,7 +1573,7 @@ function renderTechs(C){
     var conf=S.confirmDel===t.code;
     return '<article class="tcard"><div class="hd"><div class="nm">'+avatar(t)+'<div class="nm2"><span class="badge'+(i<3&&tot>0?' top':'')+'" style="align-self:flex-start">'+esc(t.label)+'</span><h3 class="ell">'+esc(t.name)+'</h3></div></div><span class="num" style="font-size:13px;color:var(--dim)">#'+(i+1)+'</span></div>'+
       '<div style="display:flex;align-items:baseline;gap:6px"><b class="num" style="font-size:22px;font-weight:600">'+fmt(tot)+'</b><span class="hint">ر.س</span></div>'+
-      '<div class="facts"><div>أيام العمل: <b>'+C.dayCount[t.code]+'</b></div><div>أفضل يوم: <b>'+fmt(C.best[t.code])+'</b></div><div>العمل الإضافي: <b>'+fmt2(C.otBy[t.code]||0)+'</b></div><div>الغياب: <b>'+fmtDays(C.abBy[t.code]||0)+'</b></div></div>'+
+      '<div class="facts"><div>أيام العمل: <b>'+C.dayCount[t.code]+'</b></div><div>أفضل يوم: <b>'+fmt(C.best[t.code])+'</b></div><div>العمل الإضافي: <b>'+fmt2(C.otBy[t.code]||0)+'</b></div><div>الغياب: <b>'+fmtDays(C.abBy[t.code]||0)+'</b></div><div class="avgf">متوسط الدخل اليومي: <b>'+(C.dayCount[t.code]?fmt(Math.round(C.totals[t.code]/C.dayCount[t.code])):'—')+'</b></div></div>'+
       '<div class="rate"><div class="stepper"><button type="button" data-rate="'+esc(t.code)+'" data-d="-0.005" aria-label="إنقاص نسبة '+esc(t.name)+'">−</button><span class="num">'+fmt2((t.rate||0)*100)+'%</span><button type="button" data-rate="'+esc(t.code)+'" data-d="0.005" aria-label="زيادة نسبة '+esc(t.name)+'">+</button></div>'+
       '<div class="comm"><small>العمولة</small><b>'+fmt2(tot*(t.rate||0))+'</b></div></div>'+
       (conf?'<div class="delrow"><button type="button" class="yes" data-deltech="'+esc(t.code)+'">تأكيد الحذف مع بياناته</button><button type="button" class="no" data-canceldel>إلغاء</button></div>'
