@@ -85,7 +85,8 @@ h1{font-family:var(--disp);font-size:clamp(28px,3.6vw,44px);line-height:1.1;font
 .cnt{min-width:22px;height:22px;padding:0 6px;border-radius:11px;background:#2a2e34;color:var(--yellow);font:600 12px var(--mono);display:inline-grid;place-items:center}
 .btn-accent{height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px}
 .btn-outline{height:44px;padding:0 16px;border-radius:10px;border:1px solid var(--accent);background:transparent;color:var(--accent-ink);font-weight:700;font-size:14px;display:inline-flex;align-items:center;gap:8px}
-.btn-accent:not(:disabled):hover,.btn-outline:not(:disabled):hover{filter:brightness(1.12)}
+.btn-mini{height:44px;padding:0 16px;border-radius:10px;border:1.5px solid #5a626c;background:#000;color:#fff;font-weight:900;font-size:14.5px;display:inline-flex;align-items:center;gap:8px}
+.btn-accent:not(:disabled):hover,.btn-outline:not(:disabled):hover,.btn-mini:hover{filter:brightness(1.12)}
 .sync{display:inline-flex;align-items:center;gap:7px;height:28px;padding:0 11px;border-radius:20px;font-size:12px;font-weight:600;border:1px solid var(--line2);color:var(--muted);background:var(--sunk)}
 .sync i{width:8px;height:8px;border-radius:50%;background:var(--dim)}
 .sync.live i{background:#46d17a;box-shadow:0 0 0 3px rgba(70,209,122,.2)}
@@ -505,7 +506,7 @@ footer.foot{padding-block:0 28px;display:flex;justify-content:space-between;gap:
   .vsep{display:none}
 }
 @media (max-width:760px){
-  #app{zoom:.85}
+  #app{zoom:.72}
   .kpi.combo .toprow{flex-wrap:wrap;gap:2px 8px}
   .kpi.combo .who.ell{white-space:normal;overflow:visible;text-overflow:clip;font-size:18px;line-height:1.25}
 }
@@ -706,8 +707,8 @@ body.ro #app input[readonly]{cursor:default}
   .tools .monthcard{grid-column:span 2;min-width:0}
   .tools .uchip{grid-column:span 2;min-width:0;height:48px;justify-content:space-between;padding:0 6px 0 8px;gap:6px}
   .tools .uchip button{height:30px;padding:0 8px;font-size:11.5px}
-  .tools>.ghost,.tools>.btn-accent,.tools>.btn-outline{grid-column:span 2;height:36px;padding:0 8px;font-size:12.5px;justify-content:center;gap:6px;min-width:0}
-  .tools>.ghost svg,.tools>.btn-accent svg,.tools>.btn-outline svg{width:14px;height:14px;flex:none}
+  .tools>.ghost,.tools>.btn-accent,.tools>.btn-outline,.tools>.btn-mini{grid-column:span 2;height:36px;padding:0 8px;font-size:12.5px;justify-content:center;gap:6px;min-width:0}
+  .tools>.ghost svg,.tools>.btn-accent svg,.tools>.btn-outline svg,.tools>.btn-mini svg{width:14px;height:14px;flex:none}
   .mpick{width:100%;height:48px}
   .mpick .n{width:48px;padding:4px 0}
   .mpick .n b{font-size:22px}
@@ -801,13 +802,13 @@ body.ro #app input[readonly]{cursor:default}
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/><path d="M12 12v6"/><path d="m9 15 3 3 3-3"/></svg>
         <span>تصدير PDF</span>
       </button>
-      <button class="btn-outline" id="pdfMBtn" type="button" data-pdf-hide hidden>
+      <button class="btn-accent" id="pdfMBtn" type="button" data-pdf-hide hidden>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="2" width="12" height="20" rx="2"/><path d="M11 18h2"/></svg>
         <span>PDF للجوال</span>
       </button>
-      <button class="btn-outline" id="miniBtn" type="button" data-pdf-hide>
+      <button class="btn-mini" id="miniBtn" type="button" data-pdf-hide>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M3 9h18M8 14h8"/></svg>
-        <span>عرض مختصر</span>
+        <span>استعراض مختصر</span>
       </button>
     </div>
   </div>
@@ -993,7 +994,7 @@ body.ro #app input[readonly]{cursor:default}
 </div>
 </div>
 
-<div id="miniOv" hidden data-pdf-hide><div class="mbar"><b>عرض مختصر</b><button type="button" id="miniX">إغلاق ✕</button></div><div class="mbody" id="miniBody"></div></div>
+<div id="miniOv" hidden data-pdf-hide><div class="mbar"><b>استعراض مختصر</b><button type="button" id="miniX">إغلاق ✕</button></div><div class="mbody" id="miniBody"></div></div>
 <div id="toast" class="toast msg ok" role="status" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
@@ -1611,7 +1612,7 @@ function renderEntrySum(){
 function isOffDay(d,n,tot){
   if(!validM()||d>n||tot)return false;
   var t=new Date();t.setHours(0,0,0,0);
-  return new Date(S.y,S.m-1,d).getTime()<=t.getTime();
+  return new Date(S.y,S.m-1,d).getTime()<t.getTime();
 }
 function renderMonth(C){
   var n=C.n,T=S.techs,mx=Math.max(1,C.maxDay),bars='',labels='';
