@@ -204,6 +204,10 @@ main{padding-block:20px 36px}
 .acard .rchip{height:26px;padding:0 12px;border-radius:13px;border:1px solid var(--rc);background:transparent;color:var(--rc);font:700 12px var(--disp);cursor:pointer}
 .acard .rchip:hover{background:var(--rc);color:#111}
 .acard .ahint{display:none}
+.acard .amv{display:inline-flex;gap:4px}
+.acard .amv button{width:30px;height:26px;border-radius:8px;border:1px solid var(--rcbd);background:transparent;color:var(--rc);display:inline-flex;align-items:center;justify-content:center;padding:0;cursor:pointer}
+.acard .amv button:disabled{opacity:.25;cursor:default}
+.acard .amv button:not(:disabled):hover{background:var(--rc);color:#111}
 .acard .rchip{display:inline-flex;align-items:center;gap:6px}
 .acard .rsel{position:relative}
 .acard .rsel.ropen,.acard:has(.rsel.ropen){z-index:50;position:relative}
@@ -1593,8 +1597,9 @@ function roleMenu(tg,cur,kind){
   return '<div class="rsel'+(open?' ropen':'')+'" data-rs="'+tg+'">'+btn+list+'</div>';
 }
 function renderAdmins(){
-  var c=admSorted().map(function(a){
-    return '<div class="acard" style="'+admStyle(a.role)+'" data-admin="'+esc(a.id)+'"><div class="ahead">'+roleMenu('c:'+a.id,a.role,'rchip')+'<span class="ahint">إداري</span></div>'+
+  var AS=admSorted(),AL=AS.length;
+  var c=AS.map(function(a,ix){
+    return '<div class="acard" style="'+admStyle(a.role)+'" data-admin="'+esc(a.id)+'"><div class="ahead">'+roleMenu('c:'+a.id,a.role,'rchip')+'<span class="amv"><button type="button" data-admmv="-1" data-id="'+esc(a.id)+'" aria-label="تقديم '+esc(a.name)+'"'+(ix===0?' disabled':'')+'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button><button type="button" data-admmv="1" data-id="'+esc(a.id)+'" aria-label="تأخير '+esc(a.name)+'"'+(ix===AL-1?' disabled':'')+'><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button></span></div>'+
       '<input class="ed nmin" type="text" value="'+esc(a.name)+'" data-adname="'+esc(a.id)+'" aria-label="اسم الإداري" title="اضغط لتعديل الاسم">'+
       '<button type="button" class="delbtn'+(S.admDel===a.id?' arm':'')+'" data-admdel="'+esc(a.id)+'">'+(S.admDel===a.id?'تأكيد الحذف':'حذف')+'</button></div>';}).join('');
   var r=S.admRole||'supervisor';
@@ -1629,6 +1634,10 @@ function addRole(tg){
     if(t.id==='admOpen'){S.roleOpen=false;S.admOpen=true;S.admDel=null;renderAdmins();var i=$('admName');if(i)i.focus();return;}
     if(t.id==='admCancel'){S.roleOpen=false;S.admOpen=false;S.admDraft='';renderAdmins();return;}
     if(t.dataset.roletg){var tg=t.dataset.roletg;S.roleOpen=S.roleOpen===tg?null:tg;S.roleNew=null;S.roleDel=null;S.nrDraft='';S.nrColor=null;renderAdmins();return;}
+    if(t.dataset.admmv){var id0=t.dataset.id,dl=+t.dataset.admmv,ord=admSorted(),i0=ord.map(function(a){return a.id;}).indexOf(id0),i1=i0+dl;
+      if(i0<0||i1<0||i1>=ord.length)return;
+      commit(function(){var o2=admSorted().map(function(a){return a.id;});var tmp=o2[i0];o2[i0]=o2[i1];o2[i1]=tmp;(S.admins||[]).forEach(function(a){a.o=o2.indexOf(a.id);});});
+      renderAdmins();renderTechs(calc());return;}
     if(t.dataset.roledel){var rk=t.dataset.roledel;
       if(S.roleDel!==rk){S.roleDel=rk;renderAdmins();return;}
       var use=(S.admins||[]).filter(function(a){return a.role===rk;});
@@ -2122,7 +2131,8 @@ function allRoles(){var h=S.rolesHidden||[];return fullRoles().filter(function(r
 function roleOf(k){var R=fullRoles();for(var i=0;i<R.length;i++)if(R[i].k===k)return R[i];return ROLES[1];}
 function admLabel(r){return roleOf(r).l;}
 function admStyle(r){var o=roleOf(r);return '--rc:'+o.c+';--rcbd:'+o.bd+';--rcbg:'+o.bg;}
-function admSorted(){var rk={};allRoles().forEach(function(o,i){rk[o.k]=i;});return (S.admins||[]).slice().sort(function(a,b){return (rk[a.role]!=null?rk[a.role]:1)-(rk[b.role]!=null?rk[b.role]:1);});}
+function admSorted(){var A=S.admins||[];if(A.some(function(a){return typeof a.o==='number';})){return A.map(function(a,i){return [a,i];}).sort(function(x,y){var p=typeof x[0].o==='number'?x[0].o:1e6+x[1],q=typeof y[0].o==='number'?y[0].o:1e6+y[1];return p-q;}).map(function(x){return x[0];});}
+  var rk={};allRoles().forEach(function(o,i){rk[o.k]=i;});return (S.admins||[]).slice().sort(function(a,b){return (rk[a.role]!=null?rk[a.role]:1)-(rk[b.role]!=null?rk[b.role]:1);});}
 function staff(){return S.techs.concat((S.admins||[]).map(function(a){return {code:a.id,label:admLabel(a.role),name:a.name,adm:true};}));}
 function techName(code){var t=staff().filter(function(x){return x.code===code;})[0];return t?t:{code:code,label:code,name:code};}
 function delBtn(attr,id){return '<button class="x" type="button" '+attr+'="'+esc(id)+'" aria-label="حذف" style="width:44px;height:44px;border-radius:10px;border:1px solid var(--line2);background:transparent;color:var(--muted);display:grid;place-items:center"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M18 6 6 18M6 6l12 12"/></svg></button>';}
