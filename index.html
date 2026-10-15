@@ -1070,15 +1070,20 @@ function saveUI(){try{localStorage.setItem(UKEY,JSON.stringify({tab:S.tab}));}ca
 function localAll(){try{return JSON.parse(localStorage.getItem(LKEY)||'null')||{techs:null,months:{}};}catch(e){return {techs:null,months:{}};}}
 function localPut(fn){var o=localAll();fn(o);try{localStorage.setItem(LKEY,JSON.stringify(o));}catch(e){}}
 function fail(e){toast(e&&e.code==='quota_exceeded'?'امتلأت مساحة الحفظ. احذف أياماً قديمة وحاول مرة أخرى.':'تعذر الحفظ الآن. تحقق من الاتصال وحاول مرة أخرى.',true);}
+var pendW={};
+function sched(k,fn){clearTimeout(saveT[k]);pendW[k]=fn;saveT[k]=setTimeout(function(){var f=pendW[k];delete pendW[k];if(f)f();},250);}
+function flushW(){Object.keys(pendW).forEach(function(k){clearTimeout(saveT[k]);var f=pendW[k];delete pendW[k];if(f)f();});}
+document.addEventListener('visibilitychange',function(){if(document.visibilityState==='hidden')flushW();});
+window.addEventListener('pagehide',flushW);window.addEventListener('beforeunload',flushW);
 function writeTechs(list){
   if(isRO())return;
-  if(db){clearTimeout(saveT.t);saveT.t=setTimeout(function(){db.doc('config/techs').set({list:list,admins:S.admins||[],roles:S.roles||[],rolesHidden:S.rolesHidden||[]}).catch(fail);},400);}
+  if(db){sched('t',function(){db.doc('config/techs').set({list:list,admins:S.admins||[],roles:S.roles||[],rolesHidden:S.rolesHidden||[]}).catch(fail);});}
   else localPut(function(o){o.techs=list;o.admins=S.admins||[];o.roles=S.roles||[];o.rolesHidden=S.rolesHidden||[];});
 }
 function writeMonth(key,days,income,expenses,overtime,revenues,absences){
   if(isRO())return;
   income=income||{};expenses=expenses||[];overtime=overtime||[];revenues=revenues||[];absences=absences||[];
-  if(db){clearTimeout(saveT[key]);saveT[key]=setTimeout(function(){db.doc('months/'+key).set({key:key,days:days,income:income,expenses:expenses,overtime:overtime,revenues:revenues,absences:absences}).catch(fail);},400);}
+  if(db){sched('m'+key,function(){db.doc('months/'+key).set({key:key,days:days,income:income,expenses:expenses,overtime:overtime,revenues:revenues,absences:absences}).catch(fail);});}
   else localPut(function(o){o.months[key]=days;o.incomes=o.incomes||{};o.incomes[key]=income;o.exps=o.exps||{};o.exps[key]=expenses;o.ots=o.ots||{};o.ots[key]=overtime;o.revs=o.revs||{};o.revs[key]=revenues;o.abss=o.abss||{};o.abss[key]=absences;});
 }
 
@@ -2284,6 +2289,7 @@ function startData(){
     if(v&&Array.isArray(v.list))S.techs=v.list.map(function(t){return {code:t.code,label:t.label||t.code,name:t.name,rate:Number(t.rate)||0};});
     else if(!S.techsLoaded){S.techs=clone(DEFAULT_TECHS);}
     S.admins=v&&Array.isArray(v.admins)?clone(v.admins):[];
+    S.roles=v&&Array.isArray(v.roles)?clone(v.roles):[];S.rolesHidden=v&&Array.isArray(v.rolesHidden)?clone(v.rolesHidden):[];
     S.techsLoaded=true;render();
   },function(){}));
   dataSubs.push(db.doc('config/photos').onSnapshot(function(snap){var v=snap.exists&&snap.data();S.photos=v&&v.map?clone(v.map):{};render();},function(){}));
