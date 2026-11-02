@@ -1,3 +1,4 @@
+// تجربة النشر التلقائي للقواعد (تعليق فقط، بدون تغيير في الصلاحيات)
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
