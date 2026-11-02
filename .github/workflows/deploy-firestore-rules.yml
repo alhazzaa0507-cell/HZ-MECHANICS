@@ -1,0 +1,42 @@
+name: Deploy Firestore Rules
+
+# ينشر قواعد Firestore تلقائيًا لما يتغير ملف firestore-rules.txt على main
+on:
+  push:
+    branches: [main]
+    paths:
+      - firestore-rules.txt
+  workflow_dispatch: {}
+
+jobs:
+  deploy-rules:
+    runs-on: ubuntu-latest
+    env:
+      PROJECT_ID: hz-mechanics
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: تجهيز إعدادات Firebase المؤقتة
+        run: |
+          cat > firebase.json <<'EOF'
+          { "firestore": { "rules": "firestore-rules.txt" } }
+          EOF
+
+      - name: تجهيز مفتاح الخدمة
+        env:
+          SA_JSON: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: |
+          if [ -z "$SA_JSON" ]; then echo "السر FIREBASE_SERVICE_ACCOUNT غير موجود"; exit 1; fi
+          printf '%s' "$SA_JSON" > "$RUNNER_TEMP/sa.json"
+          echo "GOOGLE_APPLICATION_CREDENTIALS=$RUNNER_TEMP/sa.json" >> "$GITHUB_ENV"
+
+      - name: نشر القواعد
+        run: npx --yes firebase-tools@latest deploy --only firestore:rules --project "$PROJECT_ID" --non-interactive
+
+      - name: حذف المفتاح المؤقت
+        if: always()
+        run: rm -f "$RUNNER_TEMP/sa.json"
