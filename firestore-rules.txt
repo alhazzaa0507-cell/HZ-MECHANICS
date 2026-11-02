@@ -35,5 +35,14 @@ service cloud.firestore {
       allow read: if hasRole();
       allow write: if isAdmin();
     }
+    // ملفات الموظفين (بيانات ومرفقات): القراءة لأي مستخدم مسجّل، التعديل للمدير فقط
+    match /emp/{doc} {
+      allow read: if hasRole();
+      allow write: if isAdmin();
+    }
+    match /empf/{doc} {
+      allow read: if hasRole();
+      allow write: if isAdmin();
+    }
   }
 }

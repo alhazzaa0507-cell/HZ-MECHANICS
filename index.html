@@ -196,6 +196,7 @@ main{padding-block:20px 36px}
 #tablePanel.collapsed #table{display:none}
 #app.exporting #tablePanel.collapsed #table{display:block}
 #app.exporting .foldtag{display:none}
+#app.exporting .kpi.revs{display:none}
 .entrycol{display:flex;flex-direction:column;gap:20px;min-width:0}
 .acard{--rc:#c9d2dc;--rcbd:#515c68;--rcbg:#1a1e24;display:flex;flex-direction:column;gap:8px;padding:12px;border-radius:12px;border:1px solid var(--rcbd);background:var(--rcbg)}
 .acard.mgr{--rc:#f2b93b;--rcbd:#7d5f16;--rcbg:#231b07}
@@ -527,6 +528,7 @@ footer.foot{padding-block:0 28px;display:flex;justify-content:space-between;gap:
   nav.tabs button.tab:nth-of-type(5){grid-column:span 3}
   nav.tabs button.tab:nth-of-type(6){grid-column:span 4}
   nav.tabs button.tab:nth-of-type(7){grid-column:span 3}
+  nav.tabs button.tab:nth-of-type(8){grid-column:1/-1}
   nav.tabs .rule{display:none}
   .brand img{height:52px}.brand .sep{height:44px}
   .vsep{display:none}
@@ -548,6 +550,47 @@ footer.foot{padding-block:0 28px;display:flex;justify-content:space-between;gap:
 @media (min-width:1900px){#app{zoom:.85}}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 
+.scards{padding:16px 18px 20px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+.sc{--rc:var(--accent);background:var(--deep);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:12px;min-width:0;border-inline-start:4px solid var(--rc)}
+.sc .sh{display:flex;align-items:center;gap:12px;min-width:0}
+.sc .sav{width:44px;height:44px;flex:none;display:grid;place-items:center;background:transparent;border:0;color:var(--rc)}
+.sc .sav svg{width:40px;height:40px}
+.sc .sav img{width:100%;height:100%;object-fit:cover;display:block}
+.sc .sn{display:flex;flex-direction:column;min-width:0}
+.sc .sn b{font:700 17px var(--disp);white-space:nowrap}
+.sc .sn span{font:700 12.5px var(--disp);color:var(--rc)}
+.sc .svc{margin-inline-start:auto;font-size:12px;color:var(--muted);text-align:end;white-space:nowrap}
+.sc .svc b{display:block;color:var(--ink2);font-size:13px}
+.sc .sf{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sc .sf label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:600;min-width:0}
+.sc .sf label.w{grid-column:1/-1}
+.sc .sf input{height:42px;border-radius:9px;border:1px solid var(--line2);background:var(--sunk);color:var(--ink);padding:0 10px;font:600 15px var(--mono);width:100%;min-width:0;text-align:start;font-size:16px}
+.sc .sf input[readonly]{border-color:transparent;background:transparent;padding-inline:0}
+.sc .atts{display:flex;flex-direction:column;gap:7px}
+.sc .att{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px dashed var(--line2);background:var(--sunk)}
+.sc .att.has{border-style:solid;border-color:#2f6b45;background:#0f1c15}
+.sc .att .ai{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--panel2);color:var(--muted);flex:none}
+.sc .att.has .ai{background:#17321f;color:#8ff0b4}
+.sc .att .at{flex:1;min-width:0;display:flex;flex-direction:column;line-height:1.3}
+.sc .att .at b{font:700 13px var(--disp)}
+.sc .att .at small{font-size:11px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc .att button{height:30px;padding:0 11px;border-radius:8px;border:1px solid var(--line2);background:var(--deep);color:var(--ink2);font:700 12px var(--body);flex:none}
+.sc .att button.go{border-color:var(--accent);color:var(--accent-ink)}
+.sc .att button.rm2{padding:0 9px}
+.sc .att button.rm2.arm{background:var(--err-bg);border-color:var(--err-bd);color:var(--err-ink)}
+body.ro .sedit{display:none!important}
+#empView{position:fixed;inset:0;z-index:70;background:#101214;display:flex;flex-direction:column;direction:rtl}
+#empView[hidden]{display:none}
+#empView .mbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 16px;background:#171a1e;border-bottom:1px solid #262a30;color:#f4f1ea}
+#empView .mbar b{font:700 15px var(--disp);min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#empView .evact{display:flex;gap:8px;flex:none}
+#empView .mbar button,#empView .evbtn{height:36px;padding:0 14px;border-radius:9px;border:1px solid var(--accent);background:transparent;color:var(--accent-ink);font-weight:700;display:inline-flex;align-items:center;text-decoration:none;font-size:14px}
+#empView .evbody{flex:1;min-height:0;overflow:auto;display:flex;align-items:flex-start;justify-content:center;padding:10px}
+#empView .evbody img{max-width:100%;height:auto;display:block;border-radius:8px}
+#empView .evbody iframe{width:100%;height:100%;min-height:70vh;border:0;background:#fff;border-radius:8px}
+#empView .evbody .evmsg{color:var(--muted);padding:40px 10px}
+@media (max-width:980px){.scards{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media (max-width:760px){.scards{grid-template-columns:minmax(0,1fr);padding-inline:12px}}
 /* ---------- lock / auth ---------- */
 body:not(.authed) #app{display:none}
 body.authed #lock{display:none}
@@ -735,6 +778,7 @@ body.ro #app input[readonly]{cursor:default}
   body.ro nav.tabs button#tab-exp{grid-column:span 4}
   body.ro nav.tabs button#tab-ot{grid-column:span 5}
   body.ro nav.tabs button#tab-rev{grid-column:span 3}
+  body.ro nav.tabs button#tab-staff{grid-column:1/-1}
   .uchip .who2{display:none}
   header.top .wrap{padding-block:16px;gap:12px}
   .tools{width:100%;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
@@ -862,6 +906,7 @@ body.ro #app input[readonly]{cursor:default}
     <button class="tab" role="tab" id="tab-exp" data-tab="exp" aria-selected="false"><span class="num">05</span>المصروفات</button>
     <button class="tab" role="tab" id="tab-ot" data-tab="ot" aria-selected="false"><span class="num">06</span>العمل الإضافي</button>
     <button class="tab" role="tab" id="tab-rev" data-tab="rev" aria-selected="false"><span class="num">07</span>الواردات</button>
+    <button class="tab" role="tab" id="tab-staff" data-tab="staff" aria-selected="false"><span class="num">08</span>ملفات الموظفين</button>
     <span class="rule"></span>
   </nav>
 
@@ -1001,6 +1046,12 @@ body.ro #app input[readonly]{cursor:default}
       </div>
     </section>
 
+    <section id="view-staff" class="stack" role="tabpanel" aria-labelledby="tab-staff" hidden>
+      <div class="panel"><div class="panel-h" style="background:var(--panel2)"><h2>ملفات الموظفين</h2><span class="hint" id="stHint">تاريخ المباشرة والرواتب والمرفقات لكل موظف</span></div>
+        <div class="scards" id="staffList"></div></div>
+      <input type="file" id="empFile" accept="image/*,application/pdf" hidden data-pdf-hide>
+    </section>
+
     <section id="view-rev" class="ledger" role="tabpanel" aria-labelledby="tab-rev" hidden>
       <div class="panel lform">
         <h2 class="disp">إضافة وارد</h2>
@@ -1028,6 +1079,7 @@ body.ro #app input[readonly]{cursor:default}
 </div>
 </div>
 
+<div id="empView" hidden data-pdf-hide><div class="mbar"><b id="evTitle">—</b><span class="evact"><a id="evDl" class="evbtn" download>تحميل</a><button type="button" id="evX">إغلاق ✕</button></span></div><div class="evbody" id="evBody"></div></div>
 <div id="miniOv" hidden data-pdf-hide><div class="mbar"><b>استعراض مختصر</b><button type="button" id="miniX">إغلاق ✕</button></div><div class="mbody" id="miniBody"></div></div>
 <div id="toast" class="toast msg ok" role="status" hidden></div>
 
@@ -1555,7 +1607,7 @@ function renderKpis(C){
   $('kheadT').textContent=validM()?MN[S.m-1]+' '+S.y:'';
 }
 function renderTabs(){
-  ['entry','month','techs','abs','exp','ot','rev'].forEach(function(k){$('tab-'+k).setAttribute('aria-selected',String(S.tab===k));$('view-'+k).hidden=S.tab!==k;});
+  ['entry','month','techs','abs','exp','ot','rev','staff'].forEach(function(k){$('tab-'+k).setAttribute('aria-selected',String(S.tab===k));$('view-'+k).hidden=S.tab!==k;});
 }
 function draftVals(){
   var d=curDay();
@@ -1845,10 +1897,11 @@ function render(){
   if(S.tab==='exp')renderExp();
   if(S.tab==='ot')renderOt(C);
   if(S.tab==='rev')renderRev(C);
+  if(S.tab==='staff')renderStaff();
   if(S.tab==='abs')renderAbs(C);
   applyRO();
 }
-function focusBusy(){var a=document.activeElement;return !!(a&&a.tagName==='INPUT'&&(a.dataset.cell||a.dataset.label||a.dataset.name||a.dataset.entry||(a.id&&(a.id.indexOf('nt')===0||a.id==='incIn'))));}
+function focusBusy(){var a=document.activeElement;return !!(a&&a.tagName==='INPUT'&&(a.dataset.ef||a.dataset.cell||a.dataset.label||a.dataset.name||a.dataset.entry||(a.id&&(a.id.indexOf('nt')===0||a.id==='incIn'))));}
 document.addEventListener('focusout',function(){setTimeout(function(){if(pending)render();},0);});
 
 /* ---------- messages ---------- */
@@ -1965,8 +2018,8 @@ function addTech(){
 
 /* ---------- PDF ---------- */
 function loadImg(src){return new Promise(function(r){var i=new Image();i.onload=function(){r(i);};i.onerror=function(){r(null);};i.src=src;});}
-function drawMobile(){return Promise.all([loadImg(LOGO),loadImg(MBG),loadImg(NETBG)]).then(function(im){return drawMobileNow(im[0],im[1],im[2]);});}
-function drawMobileNow(logoImg,bgImg,netImg){
+function drawMobile(qv){return Promise.all([loadImg(LOGO),loadImg(MBG),loadImg(NETBG)]).then(function(im){return drawMobileNow(im[0],im[1],im[2],qv===true);});}
+function drawMobileNow(logoImg,bgImg,netImg,qv){
   var C=calc(),S3=3,W=390,MONO="'IBM Plex Mono', monospace",BODY="'IBM Plex Sans Arabic', sans-serif",DISP="'Changa', 'IBM Plex Sans Arabic', sans-serif";
   var techs=C.sorted.filter(function(t){return C.totals[t.code]>0;}),days=[];
   for(var d=1;d<=C.n;d++){if(C.dayTotals[d-1]>0)days.push({d:d,wd:validM()?WDN[new Date(S.y,S.m-1,d).getDay()]:'',dm:d+'/'+S.m+'/'+S.y,v:C.dayTotals[d-1],total:fmt(C.dayTotals[d-1])});}
@@ -1976,7 +2029,7 @@ function drawMobileNow(logoImg,bgImg,netImg){
   var SHN={am:'صباحي',pm:'مسائي',full:'كامل'};
   var abRows=abCodes.map(function(k){var items=abG[k].slice().sort(function(p0,q0){return p0.day-q0.day;}).map(function(a0){return a0.day+'/'+S.m+' '+SHN[a0.shift];});var lines=[],cur='';items.forEach(function(it){var nx2=cur?cur+'  ·  '+it:it;if(nx2.length>44){lines.push(cur);cur=it;}else cur=nx2;});if(cur)lines.push(cur);return {k:k,lines:lines};});
   var abH=abRows.length?44+abRows.reduce(function(t0,r0){return t0+26+r0.lines.length*17+8;},0)+6:0;
-  var H=8+84+448+40+(abH?abH+12:0)+techs.length*36+12+(days.length?114+days.length*30:0)+12+40;
+  var H=8+84+(448-(qv?0:70))+40+(abH?abH+12:0)+techs.length*36+12+(days.length?114+days.length*30:0)+12+40;
   var cv=document.createElement('canvas');cv.width=W*S3;cv.height=H*S3;
   var c=cv.getContext('2d');c.scale(S3,S3);c.direction='rtl';
   function rr(x,y,w,h,r,fill,stroke){c.beginPath();c.moveTo(x+r,y);c.arcTo(x+w,y,x+w,y+h,r);c.arcTo(x+w,y+h,x,y+h,r);c.arcTo(x,y+h,x,y,r);c.arcTo(x,y,x+w,y,r);c.closePath();if(fill){c.fillStyle=fill;c.fill();}if(stroke){c.strokeStyle=stroke;c.lineWidth=1;c.stroke();}}
@@ -2033,11 +2086,11 @@ function drawMobileNow(logoImg,bgImg,netImg){
   c.fillStyle='#f5c518';c.fillRect(150,dy+36,8,8);tx('العمل الإضافي',144,dy+40,'400 11px '+BODY,'#9aa1ab');tx(m.ot,30,dy+40,'500 12px '+MONO,'#f4f1ea','left');
   if(tt){var bw=W-36-24,bx=30,ew=Math.round(bw*et/tt);c.fillStyle='#ff8a6b';c.fillRect(bx,dy+49,ew,3);c.fillStyle='#f5c518';c.fillRect(bx+ew,dy+49,bw-ew,3);}
   y+=70;
-  // revenues
-  var ry=y;rr(18,ry,W-36,60,12,'#1b1e22','#2a2e34');
+  // revenues (shown in quick view only, not in PDF)
+  if(qv){var ry=y;rr(18,ry,W-36,60,12,'#1b1e22','#2a2e34');
   tx('الواردات',W-30,ry+18,'400 12px '+BODY,'#9aa1ab');tx('للاطلاع فقط',W-30,ry+53,'600 9.5px '+BODY,'#ff6b5a');tx(fmt2(C.revTotal),W-30,ry+35,'600 17px '+MONO,'#7fd3ff');
   [['مخلفات حديد',C.revBy.iron||0,'#8fa3b8'],['مخلفات زيت',C.revBy.oil||0,'#c9a24a'],['أخرى',C.revBy.other||0,'#7fd3ff']].forEach(function(r,ri){var yy=ry+14+ri*16;c.fillStyle=r[2];c.fillRect(176,yy-4,8,8);tx(r[0],170,yy,'400 11px '+BODY,'#9aa1ab');tx(fmt2(r[1]),30,yy,'500 12px '+MONO,'#f4f1ea','left');});
-  y+=70;
+  y+=70;}
   // top tech
   var ty=y,tp=C.sorted[0]&&C.totals[C.sorted[0].code]>0?C.sorted[0]:null;rr(18,ty,W-36,60,12,'#1b1e22','#2a2e34');
   tx('الفني الأعلى إنتاجاً',W-30,ty+18,'400 12px '+BODY,'#9aa1ab');tx(tp?tp.name:'—',W-30,ty+41,'700 18px '+DISP,'#f4f1ea');
@@ -2194,6 +2247,102 @@ $('abAdd').addEventListener('click',function(){
   toast('تم تسجيل الغياب');render();
 });
 var REVT={iron:'مخلفات حديد',oil:'مخلفات زيت',other:'أخرى'};
+
+/* ---------- employee files ---------- */
+var EATT=[['iqama','صورة الإقامة'],['passport','صورة الجواز'],['contract','عقد العمل']];
+var empSubs={},empLoaded=false,empDel=null,empPick=null;
+function empSub(){
+  if(!db){if(!empLoaded){S.emp=clone(localAll().emp||{});empLoaded=true;}return;}
+  staff().forEach(function(t){var c=t.code;if(empSubs[c])return;
+    empSubs[c]=db.doc('emp/'+c).onSnapshot(function(snap){var v=snap.exists&&snap.data();S.emp=S.emp||{};S.emp[c]=v?clone(v):{};render();},function(){});});
+}
+function empSave(code){
+  if(isRO())return;var d=(S.emp||{})[code]||{};
+  if(db)sched('e'+code,function(){db.doc('emp/'+code).set(d).catch(fail);});
+  else localPut(function(o){o.emp=o.emp||{};o.emp[code]=d;});
+}
+function empFileGet(code,kind,cb){
+  if(!db){var o=localAll();cb((o.empf||{})[code+'_'+kind]||null);return;}
+  var r=db.doc('empf/'+code+'_'+kind);
+  if(r.get){r.get().then(function(s){cb(s.exists?s.data():null);}).catch(function(){cb(null);});}
+  else{var u=null,done=false;u=r.onSnapshot(function(s){if(done)return;done=true;try{if(u)u();}catch(e){}cb(s.exists?s.data():null);},function(){if(!done){done=true;cb(null);}});}
+}
+function empFilePut(code,kind,obj){
+  if(!db){try{localPut(function(o){o.empf=o.empf||{};o.empf[code+'_'+kind]=obj;});return Promise.resolve();}catch(e){return Promise.reject(e);}}
+  return db.doc('empf/'+code+'_'+kind).set(obj);
+}
+function dFmt(iso){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||'');return m?m[3]+'/'+m[2]+'/'+m[1]:'';}
+function dMask(v){var d=latin(v).replace(/\D/g,'').slice(0,8);return d.slice(0,2)+(d.length>2?'/'+d.slice(2,4):'')+(d.length>4?'/'+d.slice(4,8):'');}
+function dParse(v){var p=latin(v).split('/');if(p.length!==3)return null;var y,m,d;
+  if(p[0].length===4){y=+p[0];m=+p[1];d=+p[2];}else{d=+p[0];m=+p[1];y=+p[2];if(p[2].length!==4)return null;}
+  if(!(y>=1950&&y<=2100&&m>=1&&m<=12&&d>=1))return null;var dt=new Date(y,m-1,d);if(dt.getMonth()!==m-1||dt.getDate()!==d)return null;
+  return y+'-'+('0'+m).slice(-2)+'-'+('0'+d).slice(-2);}
+function svcText(start){
+  if(!start)return '—';var a=new Date(start+'T00:00:00'),b=new Date();if(isNaN(a)||a>b)return '—';
+  var m=(b.getFullYear()-a.getFullYear())*12+b.getMonth()-a.getMonth();if(b.getDate()<a.getDate())m--;if(m<0)m=0;
+  var y=Math.floor(m/12),r=m%12,p=[];if(y)p.push(y+' سنة');if(r)p.push(r+' شهر');return p.length?p.join(' و '):'أقل من شهر';
+}
+function renderStaff(){
+  empSub();var L=staff(),ro=isRO(),E=S.emp||{};
+  var roleOfCode=function(t){return t.adm?roleOf((S.admins||[]).filter(function(a){return a.id===t.code;})[0].role):null;};
+  $('staffList').innerHTML=L.length?L.map(function(t){
+    var e=E[t.code]||{},fl=e.files||{},rl=t.adm?roleOfCode(t):null,col=rl?rl.c:'var(--accent)',ph=S.photos&&S.photos[t.code],ini=(t.name||'').trim().charAt(0)||'؟';
+    return '<div class="sc" style="--rc:'+col+'" data-sc="'+esc(t.code)+'"><div class="sh"><div class="sav" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><circle cx="8.5" cy="10.8" r="2"/><path d="M5.4 16.2c.5-1.7 1.7-2.5 3.1-2.5s2.6.8 3.1 2.5"/><path d="M14.5 9.5h4.5M14.5 12.5h4.5M14.5 15.3h2.8"/></svg></div>'+
+      '<div class="sn"><b class="ell">'+esc(t.name)+'</b><span>'+esc(rl?rl.l:'فني')+'</span></div><div class="svc">مدة الخدمة<b>'+svcText(e.start)+'</b></div></div>'+
+      '<div class="sf"><label class="w">تاريخ المباشرة<input type="text" inputmode="numeric" lang="en" dir="ltr" maxlength="10" placeholder="DD/MM/YYYY" data-ef="start" data-c="'+esc(t.code)+'" value="'+esc(dFmt(e.start))+'"'+(ro?' readonly':'')+'></label>'+
+      '<label>الراتب الأساسي (ر.س)<input type="text" inputmode="decimal" lang="en" dir="ltr" placeholder="0" data-ef="basic" data-c="'+esc(t.code)+'" value="'+(e.basic?esc(e.basic):'')+'"'+(ro?' readonly':'')+'></label>'+
+      '<label>الراتب الإجمالي (ر.س)<input type="text" inputmode="decimal" lang="en" dir="ltr" placeholder="0" data-ef="gross" data-c="'+esc(t.code)+'" value="'+(e.gross?esc(e.gross):'')+'"'+(ro?' readonly':'')+'></label></div>'+
+      '<div class="atts">'+EATT.map(function(k){var f=fl[k[0]],has=!!(f&&f.fn),arm=empDel===t.code+'|'+k[0];
+        return '<div class="att'+(has?' has':'')+'"><span class="ai"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(has?'<path d="M20 6 9 17l-5-5"/>':'<path d="M21 12.5 12.5 21a5.5 5.5 0 0 1-7.8-7.8L13.5 4.4a3.7 3.7 0 0 1 5.2 5.2l-8.8 8.8a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9"/>')+'</svg></span>'+
+          '<span class="at"><b>'+k[1]+'</b><small>'+(has?esc(f.fn):'لم يتم الإرفاق')+'</small></span>'+
+          (has?'<button type="button" class="go" data-ev="'+esc(t.code)+'|'+k[0]+'">عرض</button><button type="button" class="sedit rm2'+(arm?' arm':'')+'" data-edel="'+esc(t.code)+'|'+k[0]+'" aria-label="حذف '+k[1]+'">'+(arm?'تأكيد':'حذف')+'</button>'
+              :'<button type="button" class="sedit go" data-eatt="'+esc(t.code)+'|'+k[0]+'">إرفاق</button>')+'</div>';}).join('')+'</div></div>';
+  }).join(''):'<div class="empty">لا يوجد موظفين بعد</div>';
+}
+function empImg(file){
+  return new Promise(function(res,rej){var rd=new FileReader();rd.onerror=function(){rej(new Error('read'));};
+    rd.onload=function(){var im=new Image();im.onerror=function(){rej(new Error('img'));};
+      im.onload=function(){var mx=1500,k=Math.min(1,mx/Math.max(im.width,im.height)),q=.82,out;
+        for(var i=0;i<6;i++){var cv=document.createElement('canvas');cv.width=Math.round(im.width*k);cv.height=Math.round(im.height*k);var cx=cv.getContext('2d');cx.fillStyle='#fff';cx.fillRect(0,0,cv.width,cv.height);cx.drawImage(im,0,0,cv.width,cv.height);out=cv.toDataURL('image/jpeg',q);if(out.length<=760000)break;k*=.82;q=Math.max(.6,q-.06);}
+        out.length<=900000?res(out):rej(new Error('big'));};
+      im.src=rd.result;};rd.readAsDataURL(file);});
+}
+function empPdf(file){
+  return new Promise(function(res,rej){if(file.size>600*1024){rej(new Error('big'));return;}var rd=new FileReader();rd.onerror=function(){rej(new Error('read'));};rd.onload=function(){res(rd.result);};rd.readAsDataURL(file);});
+}
+(function(){
+  var box=$('staffList'),fi=$('empFile');if(!box||!fi)return;
+  function field(e){var t=e.target;if(!t.dataset||!t.dataset.ef||roBlock())return;
+    var c=t.dataset.c,k=t.dataset.ef,v=t.value;
+    if(k==='start'){var raw=v.trim();if(raw===''){v='';t.style.borderColor='';}else{var iso=dParse(raw);if(!iso){t.style.borderColor='#e0665a';toast('اكتب التاريخ بالأرقام: يوم/شهر/سنة، مثال 10/02/2023',true);return;}t.style.borderColor='';v=iso;t.value=dFmt(iso);}}
+    else{v=latin(v).replace(/[^\d.]/g,'');t.value=v;}
+    S.emp=S.emp||{};S.emp[c]=S.emp[c]||{};S.emp[c][k]=v;empSave(c);
+    if(k==='start'){var sv=t.closest('.sc').querySelector('.svc b');if(sv)sv.textContent=svcText(v);}}
+  box.addEventListener('change',field);
+  box.addEventListener('input',function(e){var t=e.target;if(t.dataset&&t.dataset.ef){var v=t.dataset.ef==='start'?dMask(t.value):latin(t.value).replace(/[^\d.]/g,'');if(v!==t.value)t.value=v;}});
+  box.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.eatt){if(roBlock())return;var p=b.dataset.eatt.split('|');empPick={c:p[0],k:p[1]};fi.value='';fi.click();return;}
+    if(b.dataset.edel){if(roBlock())return;if(empDel!==b.dataset.edel){empDel=b.dataset.edel;setTimeout(function(){if(empDel===b.dataset.edel){empDel=null;renderStaff();}},4000);renderStaff();return;}
+      var p2=b.dataset.edel.split('|'),c=p2[0],k=p2[1];empDel=null;
+      empFilePut(c,k,{fn:'',ty:'',data:''}).catch(function(){});
+      S.emp=S.emp||{};S.emp[c]=S.emp[c]||{};S.emp[c].files=S.emp[c].files||{};delete S.emp[c].files[k];empSave(c);toast('تم حذف المرفق');render();return;}
+    if(b.dataset.ev){var q=b.dataset.ev.split('|'),c3=q[0],k3=q[1],nm=techName(c3).name,lb=(EATT.filter(function(a){return a[0]===k3;})[0]||[])[1]||'';
+      $('evTitle').textContent=lb+' — '+nm;$('evBody').innerHTML='<div class="evmsg">جارٍ التحميل…</div>';$('evDl').removeAttribute('href');$('empView').hidden=false;
+      empFileGet(c3,k3,function(f){var bd=$('evBody');if(!f||!f.data){bd.innerHTML='<div class="evmsg">تعذر تحميل الملف</div>';return;}
+        var dl2=$('evDl');dl2.href=f.data;dl2.setAttribute('download',f.fn||'file');
+        if(/^data:image\//.test(f.data))bd.innerHTML='<img src="'+f.data+'" alt="">';
+        else bd.innerHTML='<iframe src="'+f.data+'" title="'+esc(lb)+'"></iframe>';});return;}
+  });
+  fi.addEventListener('change',function(){var f=fi.files&&fi.files[0];if(!f||!empPick||roBlock())return;var pk=empPick;empPick=null;
+    var isPdf=/pdf/i.test(f.type)||/\.pdf$/i.test(f.name),isImg=/^image\//.test(f.type);
+    if(!isPdf&&!isImg){toast('الملف لازم يكون صورة أو PDF',true);return;}
+    toast('جارٍ تجهيز الملف…');
+    (isPdf?empPdf(f):empImg(f)).then(function(data){
+      return empFilePut(pk.c,pk.k,{fn:f.name,ty:isPdf?'pdf':'img',data:data}).then(function(){
+        S.emp=S.emp||{};S.emp[pk.c]=S.emp[pk.c]||{};S.emp[pk.c].files=S.emp[pk.c].files||{};S.emp[pk.c].files[pk.k]={fn:f.name,ty:isPdf?'pdf':'img'};empSave(pk.c);toast('تم إرفاق الملف');render();});
+    }).catch(function(e){toast(e&&e.message==='big'?(isPdf?'ملف PDF كبير، الحد 600 كيلوبايت':'الصورة كبيرة جداً'):'تعذر إرفاق الملف',true);});});
+  $('evX').addEventListener('click',function(){$('empView').hidden=true;$('evBody').innerHTML='';});
+})();
 function renderRev(C){
   var ds=$('rvDay');if(document.activeElement!==ds)ds.innerHTML=dayOptions(curDay());
   var list=S.revenues.slice().sort(function(a,b){return a.day-b.day||a.ts-b.ts;});
@@ -2225,7 +2374,7 @@ document.addEventListener('click',function(e){
   if(t.dataset.delrev){var q=t.dataset.delrev;commit(function(){S.revenues=S.revenues.filter(function(x){return x.id!==q;});});render();return;}
   if(t.dataset.delot){var j=t.dataset.delot;commit(function(){S.overtime=S.overtime.filter(function(x){return x.id!==j;});});render();return;}
 });
-var TABN={entry:'لوحة الإدخال',month:'سجل الشهر',techs:'الفنيين والعمولات',abs:'الغياب',exp:'المصروفات',ot:'العمل الإضافي',rev:'الواردات'};
+var TABN={entry:'لوحة الإدخال',month:'سجل الشهر',techs:'الفنيين والعمولات',abs:'الغياب',exp:'المصروفات',ot:'العمل الإضافي',rev:'الواردات',staff:'ملفات الموظفين'};
 function exportPdf(mobile){
   if(!window.jspdf||(!mobile&&!window.html2canvas)||!dl){toast('التصدير غير متاح في هذا العرض',true);return;}
   var b1=$('pdfBtn'),b2=$('pdfMBtn'),btn=mobile?b2:b1,lbl=btn.lastElementChild,old=lbl.textContent;
@@ -2236,7 +2385,7 @@ function exportPdf(mobile){
   function end(){b1.disabled=b2.disabled=false;lbl.textContent=old;app.classList.remove('exporting');}
   var ready=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();
   var job;
-  if(mobile)job=ready.then(drawMobile);
+  if(mobile)job=ready.then(function(){return drawMobile(false);});
   else{$('exportTitleText').textContent=TABN[S.tab]+' · '+(validM()?MN[S.m-1]:'')+' '+S.y;
     job=ready.then(function(){return window.html2canvas(app,{scale:1.25,backgroundColor:'#101214',useCORS:true,logging:false,scrollX:0,scrollY:0,windowWidth:1700,windowHeight:Math.max(900,Math.ceil(app.scrollHeight/0.7)),ignoreElements:function(n){return n.hasAttribute&&n.hasAttribute('data-pdf-hide');},onclone:fixClone});});}
   job.then(function(cv){
@@ -2250,7 +2399,7 @@ function exportPdf(mobile){
 $('miniBtn').addEventListener('click',function(){
   var ov=$('miniOv'),bd=$('miniBody');bd.innerHTML='';ov.hidden=false;
   var ready=document.fonts&&document.fonts.ready?document.fonts.ready:Promise.resolve();
-  ready.then(drawMobile).then(function(cv){bd.innerHTML='';bd.appendChild(cv);}).catch(function(){ov.hidden=true;toast('تعذر تجهيز العرض المختصر',true);});
+  ready.then(function(){return drawMobile(true);}).then(function(cv){bd.innerHTML='';bd.appendChild(cv);}).catch(function(){ov.hidden=true;toast('تعذر تجهيز العرض المختصر',true);});
 });
 $('miniX').addEventListener('click',function(){$('miniOv').hidden=true;});
 $('pdfBtn').addEventListener('click',function(){exportPdf(false);});
