@@ -1265,12 +1265,32 @@ function checkSetup(){
   showLock('load');
   db.doc('meta/setup').get().then(function(s){showLock(s.exists?'login':'setup');}).catch(function(){showLock('login');});
 }
+/* قفل مرة وحدة لحساب المدير: ما يفتح إلا بكتابة العبارة، وبعدها ينحفظ في حساب المدير */
+var farisOv=null;
+function farisLock(uid){
+  if(farisOv)return;
+  var ov=document.createElement('div');farisOv=ov;
+  ov.style.cssText='position:fixed;inset:0;z-index:99999;background:radial-gradient(70% 60% at 50% 40%,#1a1d21 0%,#0c0e10 75%);display:flex;align-items:center;justify-content:center;padding:20px;direction:rtl;font-family:inherit;color:#f4f1ea';
+  ov.innerHTML='<div style="width:100%;max-width:340px;text-align:center"><div style="font-size:44px;line-height:1;margin-bottom:14px">&#128274;</div><div style="font-size:19px;font-weight:800;margin-bottom:8px">البرنامج مقفل</div><div style="font-size:13.5px;color:#9aa1ab;margin-bottom:18px">اكتب فارس عمي عشان أفتح لك البرنامج</div><input id="farisIn" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" style="box-sizing:border-box;width:100%;height:46px;border-radius:10px;border:1.5px solid #343a42;background:#121416;color:#f4f1ea;text-align:center;font-size:16px;outline:none;padding:0 12px" /><div id="farisErr" style="min-height:20px;margin:8px 0 6px;font-size:13px;color:#ff6b5e"></div><button id="farisBtn" type="button" style="width:100%;height:46px;border-radius:10px;border:1px solid #ff7a1a;background:#ff7a1a;color:#16181b;font-weight:800;font-size:15px">فتح</button></div>';
+  document.body.appendChild(ov);
+  var inp=ov.querySelector('#farisIn'),err=ov.querySelector('#farisErr'),btn=ov.querySelector('#farisBtn');
+  function nz(t){return String(t||'').replace(/[\u064B-\u065F\u0670\u0640]/g,'').replace(/\s+/g,' ').trim();}
+  function go(){
+    if(nz(inp.value)!==nz('فارس عمي')){err.textContent='الكلمة غلط، جرّب مرة ثانية';inp.select();return;}
+    btn.disabled=true;
+    db.doc('users/'+uid).update({fares:true}).catch(function(){}).then(function(){ov.remove();farisOv=null;});
+  }
+  btn.addEventListener('click',go);
+  inp.addEventListener('keydown',function(e){if(e.key==='Enter')go();});
+  setTimeout(function(){try{inp.focus();}catch(e){}},50);
+}
 function handleUser(user){
   db.doc('users/'+user.uid).get().then(function(snap){
     if(!snap.exists){pendingFx=false;fbAuth.signOut();setTimeout(function(){lErr('هذا الحساب ما عنده صلاحية دخول');},300);return;}
     var d=snap.data(),u={u:d.username,role:d.role==='admin'?'admin':'viewer',uid:user.uid};
     startData();
     if(pendingFx){pendingFx=false;loginFx(u);}else enter(u);
+    if(u.role==='admin'&&!d.fares)farisLock(user.uid);
     if(meUnsub)meUnsub();
     meUnsub=db.doc('users/'+user.uid).onSnapshot(function(s){
       if(!S.me)return;
