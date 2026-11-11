@@ -2328,7 +2328,7 @@ function empImg(file){
       im.src=rd.result;};rd.readAsDataURL(file);});
 }
 function empPdf(file){
-  return new Promise(function(res,rej){if(file.size>600*1024){rej(new Error('big'));return;}var rd=new FileReader();rd.onerror=function(){rej(new Error('read'));};rd.onload=function(){res(rd.result);};rd.readAsDataURL(file);});
+  return new Promise(function(res,rej){if(file.size>700*1024){rej(new Error('big'));return;}var rd=new FileReader();rd.onerror=function(){rej(new Error('read'));};rd.onload=function(){res(rd.result);};rd.readAsDataURL(file);});
 }
 (function(){
   var box=$('staffList'),fi=$('empFile');if(!box||!fi)return;
@@ -2360,7 +2360,7 @@ function empPdf(file){
     (isPdf?empPdf(f):empImg(f)).then(function(data){
       return empFilePut(pk.c,pk.k,{fn:f.name,ty:isPdf?'pdf':'img',data:data}).then(function(){
         S.emp=S.emp||{};S.emp[pk.c]=S.emp[pk.c]||{};S.emp[pk.c].files=S.emp[pk.c].files||{};S.emp[pk.c].files[pk.k]={fn:f.name,ty:isPdf?'pdf':'img'};empSave(pk.c);toast('تم إرفاق الملف');render();});
-    }).catch(function(e){toast(e&&e.message==='big'?(isPdf?'ملف PDF كبير، الحد 600 كيلوبايت':'الصورة كبيرة جداً'):'تعذر إرفاق الملف',true);});});
+    }).catch(function(e){toast(e&&e.message==='big'?(isPdf?'ملف PDF كبير، الحد 700 كيلوبايت':'الصورة كبيرة جداً'):'تعذر إرفاق الملف',true);});});
   $('evX').addEventListener('click',function(){$('empView').hidden=true;$('evBody').innerHTML='';});
 })();
 function renderRev(C){
