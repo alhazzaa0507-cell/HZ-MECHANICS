@@ -567,6 +567,18 @@ footer.foot{padding-block:0 28px;display:flex;justify-content:space-between;gap:
 .sc .sf input{height:42px;border-radius:9px;border:1px solid var(--line2);background:var(--sunk);color:var(--ink);padding:0 10px;font:600 15px var(--mono);width:100%;min-width:0;text-align:start;font-size:16px}
 .sc .sf input[readonly]{border-color:transparent;background:transparent;padding-inline:0}
 .sc .atts{display:flex;flex-direction:column;gap:7px}
+.sc .attbtn{align-self:flex-start;display:inline-flex;align-items:center;gap:7px;height:34px;padding:0 14px;border-radius:17px;border:1px solid var(--line2);background:var(--panel2);color:var(--ink2);font:700 13.5px var(--disp)}
+.sc .attbtn svg{flex:none}
+.sc .attbtn.on{background:var(--accent);border-color:var(--accent);color:#16181b}
+.sc .ated{display:flex;flex-direction:column;gap:8px;padding:10px;border-radius:10px;border:1px solid var(--line2);background:var(--sunk)}
+.sc .ated .ah{font-size:12.5px;color:var(--muted);line-height:1.5}
+.sc .ated .ar{display:flex;gap:8px;align-items:center}
+.sc .ated input{flex:1;min-width:0;height:42px;border-radius:9px;border:1px solid var(--line2);background:var(--panel2);color:var(--ink);padding:0 10px;font:600 15px var(--body);font-size:16px}
+.sc .ated button{height:42px;padding:0 14px;border-radius:9px;border:1px solid var(--accent);background:transparent;color:var(--accent-ink);font-weight:700;font-size:14px;flex:none}
+.sc .ated button.rm{border-color:#6b2f2f;color:#ff8a7a}
+.sc .ated button.rm.arm{background:#6b2f2f;color:#fff}
+.sc .ated button.dn{background:var(--accent);color:#16181b}
+body.ro .sc .ated{display:none!important}
 .sc .att{display:flex;align-items:center;gap:8px;padding:8px 10px;border-radius:10px;border:1px dashed var(--line2);background:var(--sunk)}
 .sc .att.has{border-style:solid;border-color:#2f6b45;background:#0f1c15}
 .sc .att .ai{width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--panel2);color:var(--muted);flex:none}
@@ -2270,6 +2282,21 @@ var REVT={iron:'مخلفات حديد',oil:'مخلفات زيت',other:'أخرى
 
 /* ---------- employee files ---------- */
 var EATT=[['iqama','صورة الإقامة'],['passport','صورة الجواز'],['contract','عقد العمل']];
+/* خانات المرفقات لكل موظف لحاله: محفوظة في ملفه (حقل atts)، وإذا ما تعدّلت نستخدم الثلاث الافتراضية */
+var attEditCode=null,attDel=null,attDraft='';
+function attList(code){var e=(S.emp||{})[code]||{};return Array.isArray(e.atts)?e.atts:EATT.map(function(a){return {k:a[0],l:a[1]};});}
+function attArr(code){return attList(code).map(function(a){return [a.k,a.l];});}
+function attSave(code,list){S.emp=S.emp||{};S.emp[code]=S.emp[code]||{};S.emp[code].atts=list;empSave(code);}
+function attEdHtml(code,ro){
+  if(ro)return '';
+  var open=attEditCode===code,h='<button type="button" class="sedit attbtn'+(open?' on':'')+'" data-atedit="'+esc(code)+'">'+(open?'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>تم':'<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></svg>تعديل')+'</button>';
+  if(!open)return h;
+  var L=attList(code),fl=((S.emp||{})[code]||{}).files||{};
+  return h+'<div class="ated"><div class="ah">غيّر اسم الخانة أو احذفها أو أضف خانة جديدة لهذا الموظف فقط.</div>'+
+    L.map(function(a){var has=fl[a.k]&&fl[a.k].fn,arm=attDel===code+'|'+a.k;
+      return '<div class="ar"><input type="text" maxlength="30" value="'+esc(a.l)+'" data-atl="'+esc(a.k)+'" data-ac="'+esc(code)+'" aria-label="اسم الخانة"><button type="button" class="rm'+(arm?' arm':'')+'" data-atd="'+esc(code)+'|'+esc(a.k)+'">'+(arm?(has?'تأكيد (يحذف الملف)':'تأكيد الحذف'):'حذف')+'</button></div>';}).join('')+
+    (L.length<12?'<div class="ar"><input type="text" maxlength="30" id="attNew" data-ac="'+esc(code)+'" value="'+esc(attDraft)+'" placeholder="اسم خانة جديدة، مثل: شهادة صحية"><button type="button" class="dn" data-atadd="'+esc(code)+'">إضافة</button></div>':'')+'</div>';
+}
 var empSubs={},empLoaded=false,empDel=null,empPick=null;
 function empSub(){
   if(!db){if(!empLoaded){S.emp=clone(localAll().emp||{});empLoaded=true;}return;}
@@ -2331,11 +2358,11 @@ function renderStaff(){
       '<div class="sf"><label class="w">تاريخ المباشرة<input type="text" inputmode="numeric" lang="en" dir="ltr" maxlength="10" placeholder="DD/MM/YYYY" data-ef="start" data-c="'+esc(t.code)+'" value="'+esc(dFmt(e.start))+'"'+(ro?' readonly':'')+'></label>'+
       '<label>الراتب الأساسي (ر.س)<input type="text" inputmode="decimal" lang="en" dir="ltr" placeholder="0" data-ef="basic" data-c="'+esc(t.code)+'" value="'+(e.basic?esc(e.basic):'')+'"'+(ro?' readonly':'')+'></label>'+
       '<label>الراتب الإجمالي (ر.س)<input type="text" inputmode="decimal" lang="en" dir="ltr" placeholder="0" data-ef="gross" data-c="'+esc(t.code)+'" value="'+(e.gross?esc(e.gross):'')+'"'+(ro?' readonly':'')+'></label></div>'+
-      '<div class="atts">'+EATT.map(function(k){var f=fl[k[0]],has=!!(f&&f.fn),arm=empDel===t.code+'|'+k[0];
+      '<div class="atts">'+attArr(t.code).map(function(k){var f=fl[k[0]],has=!!(f&&f.fn),arm=empDel===t.code+'|'+k[0];
         return '<div class="att'+(has?' has':'')+'"><span class="ai"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(has?'<path d="M20 6 9 17l-5-5"/>':'<path d="M21 12.5 12.5 21a5.5 5.5 0 0 1-7.8-7.8L13.5 4.4a3.7 3.7 0 0 1 5.2 5.2l-8.8 8.8a1.8 1.8 0 0 1-2.6-2.6l7.9-7.9"/>')+'</svg></span>'+
-          '<span class="at"><b>'+k[1]+'</b><small>'+(has?esc(f.fn):'لم يتم الإرفاق')+'</small></span>'+
-          (has?'<button type="button" class="go" data-ev="'+esc(t.code)+'|'+k[0]+'">عرض</button><button type="button" class="sedit rm2'+(arm?' arm':'')+'" data-edel="'+esc(t.code)+'|'+k[0]+'" aria-label="حذف '+k[1]+'">'+(arm?'تأكيد':'حذف')+'</button>'
-              :'<button type="button" class="sedit go" data-eatt="'+esc(t.code)+'|'+k[0]+'">إرفاق</button>')+'</div>';}).join('')+'</div></div>';
+          '<span class="at"><b>'+esc(k[1])+'</b><small>'+(has?esc(f.fn):'لم يتم الإرفاق')+'</small></span>'+
+          (has?'<button type="button" class="go" data-ev="'+esc(t.code)+'|'+k[0]+'">عرض</button><button type="button" class="sedit rm2'+(arm?' arm':'')+'" data-edel="'+esc(t.code)+'|'+k[0]+'" aria-label="حذف '+esc(k[1])+'">'+(arm?'تأكيد':'حذف')+'</button>'
+              :'<button type="button" class="sedit go" data-eatt="'+esc(t.code)+'|'+k[0]+'">إرفاق</button>')+'</div>';}).join('')+'</div>'+attEdHtml(t.code,ro)+'</div>';
   }).join(''):'<div class="empty">لا يوجد موظفين بعد</div>';
 }
 function empImg(file){
@@ -2358,14 +2385,30 @@ function empPdf(file){
     S.emp=S.emp||{};S.emp[c]=S.emp[c]||{};S.emp[c][k]=v;empSave(c);
     if(k==='start'){var sv=t.closest('.sc').querySelector('.svc b');if(sv)sv.textContent=svcText(v);}}
   box.addEventListener('change',field);
-  box.addEventListener('input',function(e){var t=e.target;if(t.dataset&&t.dataset.ef){var v=t.dataset.ef==='start'?dMask(t.value):latin(t.value).replace(/[^\d.]/g,'');if(v!==t.value)t.value=v;}});
+  box.addEventListener('change',function(e){var t=e.target;if(!t.dataset||!t.dataset.atl||roBlock())return;
+    var c=t.dataset.ac,nm=t.value.trim(),L=attList(c).map(function(a){return {k:a.k,l:a.l};});
+    if(!nm||L.some(function(a){return a.k!==t.dataset.atl&&a.l===nm;})){renderStaff();if(nm)toast('هذي الخانة موجودة',true);return;}
+    L.forEach(function(a){if(a.k===t.dataset.atl)a.l=nm;});attSave(c,L);renderStaff();toast('تم تعديل الاسم');});
+  box.addEventListener('keydown',function(e){if(e.target.id==='attNew'&&e.key==='Enter'){e.preventDefault();attAddNew(e.target.dataset.ac);}});
+  function attAddNew(c){var el=$('attNew'),nm=el?el.value.trim():'';if(!nm){if(el)el.focus();return;}if(roBlock())return;
+    var L=attList(c).map(function(a){return {k:a.k,l:a.l};});if(L.length>=12){toast('وصلت الحد الأعلى للخانات',true);return;}
+    if(L.some(function(a){return a.l===nm;})){toast('هذي الخانة موجودة',true);return;}
+    L.push({k:'a'+newId(),l:nm});attDraft='';attSave(c,L);renderStaff();toast('تمت إضافة الخانة');var n2=$('attNew');if(n2)n2.focus();}
+  box.addEventListener('input',function(e){var t=e.target;if(t.id==='attNew'){attDraft=t.value;return;}if(t.dataset&&t.dataset.ef){var v=t.dataset.ef==='start'?dMask(t.value):latin(t.value).replace(/[^\d.]/g,'');if(v!==t.value)t.value=v;}});
   box.addEventListener('click',function(e){var b=e.target.closest('button');if(!b)return;
+    if(b.dataset.atedit){if(roBlock())return;attEditCode=attEditCode===b.dataset.atedit?null:b.dataset.atedit;attDel=null;attDraft='';renderStaff();return;}
+    if(b.dataset.atadd){attAddNew(b.dataset.atadd);return;}
+    if(b.dataset.atd){if(roBlock())return;var ad=b.dataset.atd,ap=ad.split('|'),ac=ap[0],ak=ap[1];
+      if(attDel!==ad){attDel=ad;setTimeout(function(){if(attDel===ad){attDel=null;renderStaff();}},4000);renderStaff();return;}
+      attDel=null;var af=((S.emp||{})[ac]||{}).files||{};
+      if(af[ak]){empFilePut(ac,ak,{fn:'',ty:'',data:''}).catch(function(){});delete af[ak];}
+      attSave(ac,attList(ac).filter(function(a){return a.k!==ak;}));renderStaff();toast('تم حذف الخانة');return;}
     if(b.dataset.eatt){if(roBlock())return;var p=b.dataset.eatt.split('|');empPick={c:p[0],k:p[1]};fi.value='';fi.click();return;}
     if(b.dataset.edel){if(roBlock())return;if(empDel!==b.dataset.edel){empDel=b.dataset.edel;setTimeout(function(){if(empDel===b.dataset.edel){empDel=null;renderStaff();}},4000);renderStaff();return;}
       var p2=b.dataset.edel.split('|'),c=p2[0],k=p2[1];empDel=null;
       empFilePut(c,k,{fn:'',ty:'',data:''}).catch(function(){});
       S.emp=S.emp||{};S.emp[c]=S.emp[c]||{};S.emp[c].files=S.emp[c].files||{};delete S.emp[c].files[k];empSave(c);toast('تم حذف المرفق');render();return;}
-    if(b.dataset.ev){var q=b.dataset.ev.split('|'),c3=q[0],k3=q[1],nm=techName(c3).name,lb=(EATT.filter(function(a){return a[0]===k3;})[0]||[])[1]||'';
+    if(b.dataset.ev){var q=b.dataset.ev.split('|'),c3=q[0],k3=q[1],nm=techName(c3).name,lb=(attArr(c3).filter(function(a){return a[0]===k3;})[0]||[])[1]||'';
       $('evTitle').textContent=lb+' — '+nm;$('evBody').innerHTML='<div class="evmsg">جارٍ التحميل…</div>';$('evDl').removeAttribute('href');$('empView').hidden=false;
       empFileGet(c3,k3,function(f){var bd=$('evBody');if(!f||!f.data){bd.innerHTML='<div class="evmsg">تعذر تحميل الملف</div>';return;}
         var dl2=$('evDl');dl2.setAttribute('download',f.fn||'file');
