@@ -2292,7 +2292,7 @@ function empFileGet(code,kind,cb){
   if(r.get){r.get().then(function(s){jn(s.exists?s.data():null);}).catch(function(){cb(null);});}
   else{var u=null,done=false;u=r.onSnapshot(function(s){if(done)return;done=true;try{if(u)u();}catch(e){}jn(s.exists?s.data():null);},function(){if(!done){done=true;cb(null);}});}
 }
-var EMP_CH=700000;
+var EMP_CH=700000,evUrl=null;
 function empFilePut(code,kind,obj){
   if(!db){try{localPut(function(o){o.empf=o.empf||{};o.empf[code+'_'+kind]=obj;});return Promise.resolve();}catch(e){return Promise.reject(e);}}
   /* الملف الكبير يتقسّم على عدة مستندات (حد المستند في Firestore واحد ميغابايت): الأساسي فيه الجزء الأول والعدد n */
@@ -2347,7 +2347,7 @@ function empImg(file){
       im.src=rd.result;};rd.readAsDataURL(file);});
 }
 function empPdf(file){
-  return new Promise(function(res,rej){if(file.size>1000*1024){rej(new Error('big'));return;}var rd=new FileReader();rd.onerror=function(){rej(new Error('read'));};rd.onload=function(){res(rd.result);};rd.readAsDataURL(file);});
+  return new Promise(function(res,rej){if(file.size>5*1024*1024){rej(new Error('big'));return;}var rd=new FileReader();rd.onerror=function(){rej(new Error('read'));};rd.onload=function(){res(rd.result);};rd.readAsDataURL(file);});
 }
 (function(){
   var box=$('staffList'),fi=$('empFile');if(!box||!fi)return;
@@ -2368,9 +2368,11 @@ function empPdf(file){
     if(b.dataset.ev){var q=b.dataset.ev.split('|'),c3=q[0],k3=q[1],nm=techName(c3).name,lb=(EATT.filter(function(a){return a[0]===k3;})[0]||[])[1]||'';
       $('evTitle').textContent=lb+' — '+nm;$('evBody').innerHTML='<div class="evmsg">جارٍ التحميل…</div>';$('evDl').removeAttribute('href');$('empView').hidden=false;
       empFileGet(c3,k3,function(f){var bd=$('evBody');if(!f||!f.data){bd.innerHTML='<div class="evmsg">تعذر تحميل الملف</div>';return;}
-        var dl2=$('evDl');dl2.href=f.data;dl2.setAttribute('download',f.fn||'file');
-        if(/^data:image\//.test(f.data))bd.innerHTML='<img src="'+f.data+'" alt="">';
-        else bd.innerHTML='<iframe src="'+f.data+'" title="'+esc(lb)+'"></iframe>';});return;}
+        var dl2=$('evDl');dl2.setAttribute('download',f.fn||'file');
+        if(/^data:image\//.test(f.data)){dl2.href=f.data;bd.innerHTML='<img src="'+f.data+'" alt="">';return;}
+        /* الـ PDF يتعرض عبر blob عشان ما يتقيّد بحد طول الرابط في المتصفح */
+        var url=f.data;try{var bin=atob(f.data.slice(f.data.indexOf(',')+1)),u8=new Uint8Array(bin.length);for(var i=0;i<bin.length;i++)u8[i]=bin.charCodeAt(i);url=URL.createObjectURL(new Blob([u8],{type:'application/pdf'}));evUrl=url;}catch(e){}
+        dl2.href=url;bd.innerHTML='<iframe src="'+url+'" title="'+esc(lb)+'"></iframe>';});return;}
   });
   fi.addEventListener('change',function(){var f=fi.files&&fi.files[0];if(!f||!empPick||roBlock())return;var pk=empPick;empPick=null;
     var isPdf=/pdf/i.test(f.type)||/\.pdf$/i.test(f.name),isImg=/^image\//.test(f.type);
@@ -2379,8 +2381,8 @@ function empPdf(file){
     (isPdf?empPdf(f):empImg(f)).then(function(data){
       return empFilePut(pk.c,pk.k,{fn:f.name,ty:isPdf?'pdf':'img',data:data}).then(function(){
         S.emp=S.emp||{};S.emp[pk.c]=S.emp[pk.c]||{};S.emp[pk.c].files=S.emp[pk.c].files||{};S.emp[pk.c].files[pk.k]={fn:f.name,ty:isPdf?'pdf':'img'};empSave(pk.c);toast('تم إرفاق الملف');render();});
-    }).catch(function(e){toast(e&&e.message==='big'?(isPdf?'ملف PDF كبير، الحد 1000 كيلوبايت':'الصورة كبيرة جداً'):'تعذر إرفاق الملف',true);});});
-  $('evX').addEventListener('click',function(){$('empView').hidden=true;$('evBody').innerHTML='';});
+    }).catch(function(e){toast(e&&e.message==='big'?(isPdf?'ملف PDF كبير، الحد 5 ميغابايت (ضغّطه وجرّب مرة ثانية)':'الصورة كبيرة جداً'):'تعذر إرفاق الملف',true);});});
+  $('evX').addEventListener('click',function(){$('empView').hidden=true;$('evBody').innerHTML='';if(evUrl){try{URL.revokeObjectURL(evUrl);}catch(e){}evUrl=null;}});
 })();
 function renderRev(C){
   var ds=$('rvDay');if(document.activeElement!==ds)ds.innerHTML=dayOptions(curDay());
