@@ -2284,12 +2284,31 @@ function empSave(code){
 function empFileGet(code,kind,cb){
   if(!db){var o=localAll();cb((o.empf||{})[code+'_'+kind]||null);return;}
   var r=db.doc('empf/'+code+'_'+kind);
-  if(r.get){r.get().then(function(s){cb(s.exists?s.data():null);}).catch(function(){cb(null);});}
-  else{var u=null,done=false;u=r.onSnapshot(function(s){if(done)return;done=true;try{if(u)u();}catch(e){}cb(s.exists?s.data():null);},function(){if(!done){done=true;cb(null);}});}
+  function jn(f){
+    if(!f||!(f.n>1)){cb(f);return;}
+    var ps=[];for(var i=1;i<f.n;i++)ps.push(db.doc('empf/'+code+'_'+kind+'_'+i).get());
+    Promise.all(ps).then(function(ss){var d=f.data;for(var j=0;j<ss.length;j++){if(!ss[j].exists){cb(null);return;}d+=ss[j].data().data||'';}cb({fn:f.fn,ty:f.ty,data:d});}).catch(function(){cb(null);});
+  }
+  if(r.get){r.get().then(function(s){jn(s.exists?s.data():null);}).catch(function(){cb(null);});}
+  else{var u=null,done=false;u=r.onSnapshot(function(s){if(done)return;done=true;try{if(u)u();}catch(e){}jn(s.exists?s.data():null);},function(){if(!done){done=true;cb(null);}});}
 }
+var EMP_CH=700000;
 function empFilePut(code,kind,obj){
   if(!db){try{localPut(function(o){o.empf=o.empf||{};o.empf[code+'_'+kind]=obj;});return Promise.resolve();}catch(e){return Promise.reject(e);}}
-  return db.doc('empf/'+code+'_'+kind).set(obj);
+  /* الملف الكبير يتقسّم على عدة مستندات (حد المستند في Firestore واحد ميغابايت): الأساسي فيه الجزء الأول والعدد n */
+  var base='empf/'+code+'_'+kind,d=obj.data||'',parts=[];
+  for(var i=0;i<d.length;i+=EMP_CH)parts.push(d.slice(i,i+EMP_CH));
+  if(!parts.length)parts=[''];
+  return db.doc(base).get().then(function(s){return s.exists&&s.data().n||1;},function(){return 1;}).then(function(oldN){
+    var rest=[];for(var k=1;k<parts.length;k++)rest.push(db.doc(base+'_'+k).set({data:parts[k]}));
+    return Promise.all(rest).then(function(){
+      var m={fn:obj.fn,ty:obj.ty,data:parts[0]};if(parts.length>1)m.n=parts.length;
+      return db.doc(base).set(m);
+    }).then(function(){
+      var del=[];for(var j=parts.length;j<oldN;j++)del.push(db.doc(base+'_'+j).delete().catch(function(){}));
+      return Promise.all(del);
+    });
+  });
 }
 function dFmt(iso){var m=/^(\d{4})-(\d{2})-(\d{2})$/.exec(iso||'');return m?m[3]+'/'+m[2]+'/'+m[1]:'';}
 function dMask(v){var d=latin(v).replace(/\D/g,'').slice(0,8);return d.slice(0,2)+(d.length>2?'/'+d.slice(2,4):'')+(d.length>4?'/'+d.slice(4,8):'');}
@@ -2328,7 +2347,7 @@ function empImg(file){
       im.src=rd.result;};rd.readAsDataURL(file);});
 }
 function empPdf(file){
-  return new Promise(function(res,rej){if(file.size>700*1024){rej(new Error('big'));return;}var rd=new FileReader();rd.onerror=function(){rej(new Error('read'));};rd.onload=function(){res(rd.result);};rd.readAsDataURL(file);});
+  return new Promise(function(res,rej){if(file.size>1000*1024){rej(new Error('big'));return;}var rd=new FileReader();rd.onerror=function(){rej(new Error('read'));};rd.onload=function(){res(rd.result);};rd.readAsDataURL(file);});
 }
 (function(){
   var box=$('staffList'),fi=$('empFile');if(!box||!fi)return;
@@ -2360,7 +2379,7 @@ function empPdf(file){
     (isPdf?empPdf(f):empImg(f)).then(function(data){
       return empFilePut(pk.c,pk.k,{fn:f.name,ty:isPdf?'pdf':'img',data:data}).then(function(){
         S.emp=S.emp||{};S.emp[pk.c]=S.emp[pk.c]||{};S.emp[pk.c].files=S.emp[pk.c].files||{};S.emp[pk.c].files[pk.k]={fn:f.name,ty:isPdf?'pdf':'img'};empSave(pk.c);toast('تم إرفاق الملف');render();});
-    }).catch(function(e){toast(e&&e.message==='big'?(isPdf?'ملف PDF كبير، الحد 700 كيلوبايت':'الصورة كبيرة جداً'):'تعذر إرفاق الملف',true);});});
+    }).catch(function(e){toast(e&&e.message==='big'?(isPdf?'ملف PDF كبير، الحد 1000 كيلوبايت':'الصورة كبيرة جداً'):'تعذر إرفاق الملف',true);});});
   $('evX').addEventListener('click',function(){$('empView').hidden=true;$('evBody').innerHTML='';});
 })();
 function renderRev(C){
